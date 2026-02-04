@@ -7,8 +7,8 @@ finestra = tk.Tk()
 finestra.title("Aventura grafica RPG")
 finestra.geometry(f"{finestraX}x{finestraY}")
 
-canvasX = finestraX / 1.25
-canvasY = finestraY / 1.25
+canvasX = finestraX // 2
+canvasY = finestraY // 2
 print(canvasX)
 print(canvasY)
 
@@ -17,17 +17,75 @@ LlistaMapa = [[1,2,3],[4,5,6],[7,8,9]]
 posMapX = 1
 posMapY = 1
 
-
-
 canvas = tk.Canvas(finestra, width=canvasX, height=canvasY, bg="lightblue")
 
 image1 = tk.PhotoImage(file="img/PobleInicial.png")
-novaEscena = image1
-img_escena_id = canvas.create_image(finestraX / 2, finestraY / 2, image = novaEscena)
+image2 = tk.PhotoImage(file="img/Prado.png")
 
-x_center = (finestraX - canvasX) / 2
-y_center = (finestraY - canvasY) / 2
+novaEscena = image1
+img_escena_id = canvas.create_image(finestraX // 4, finestraY // 4, image = novaEscena)
+
+x_center = (finestraX - canvasX) // 2
+y_center = (finestraY - canvasY) // 2
 canvas.place(x=x_center, y=y_center)
+
+entrada = tk.Entry(finestra,font=("Arial", 14))
+entrada.place(x=x_center * 1.4, y=y_center * 3.2)
+
+posicionMapa = LlistaMapa[posMapY][posMapX]
+
+def moviment():
+    global posMapY, posMapX
+    
+    text = entrada.get()
+    match text:
+        case "nord":
+            posMapY -= 1
+    
+        case "sud":
+            posMapY += 1
+        
+        case "est":
+            posMapX += 1
+
+        case "oest":
+            posMapX -= 1
+
+    posicionMapa = LlistaMapa[posMapY][posMapX]
+
+    print (posicionMapa)
+
+entrada.bind("<Return>", moviment())
+    
+match posicionMapa:
+    case 1:
+        print ("estas a l'escena 1")
+    
+    case 2:
+        print ("estas a l'escena 2")
+    
+    case 3:
+        print ("estas a l'escena 3")
+
+    case 4:
+        print ("estas a l'escena 4")
+        novaEscena = image2
+    
+    case 5:
+        print ("estas a l'escena 5")
+    
+    case 6:
+        print ("estas a l'escena 6")
+    
+    case 7:
+        print ("estas a l'escena 7")
+
+    case 8:
+        print ("estas a l'escena 8")
+    
+    case 9:
+        print ("estas a l'escena 9")
+    
 
 
 finestra.mainloop()

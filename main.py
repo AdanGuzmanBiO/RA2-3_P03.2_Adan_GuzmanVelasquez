@@ -29,18 +29,55 @@ x_center = (finestraX - canvasX) // 2
 y_center = (finestraY - canvasY) // 2
 canvas.place(x=x_center, y=y_center)
 
+posicionMapa = LlistaMapa[posMapY][posMapX]
+def actualitzaEscena(escena):
+    global posMapX, posMapY, image1, image2, novaEscena
+
+    match posicionMapa:
+
+        case 1:
+            print ("estas a l'escena 1")
+        
+        case 2:
+            print ("estas a l'escena 2")
+        
+        case 3:
+            print ("estas a l'escena 3")
+
+        case 4:
+            print ("estas a l'escena 4")
+            novaEscena = image2
+            actualitzaEscena(LlistaMapa[posMapY][posMapX])
+        
+        case 5:
+            print ("estas a l'escena 5")
+        
+        case 6:
+            print ("estas a l'escena 6")
+        
+        case 7:
+            print ("estas a l'escena 7")
+
+        case 8:
+            print ("estas a l'escena 8")
+        
+        case 9:
+            print ("estas a l'escena 9")
+        
+    canvas.itemconfig(img_escena_id, image= novaEscena)
+
+
 entrada = tk.Entry(finestra,font=("Arial", 14))
 entrada.place(x=x_center * 1.4, y=y_center * 3.2)
 
-posicionMapa = LlistaMapa[posMapY][posMapX]
-
-def moviment():
-    global posMapY, posMapX
+def moviment(event=None):
+    global posMapY, posMapX, posicionMapa
     
     text = entrada.get()
     match text:
         case "nord":
             posMapY -= 1
+            actualitzaEscena(LlistaMapa[posMapY][posMapX])
     
         case "sud":
             posMapY += 1
@@ -52,40 +89,17 @@ def moviment():
             posMapX -= 1
 
     posicionMapa = LlistaMapa[posMapY][posMapX]
+    entrada.delete(0, tk.END)
 
     print (posicionMapa)
 
-entrada.bind("<Return>", moviment())
-    
-match posicionMapa:
-    case 1:
-        print ("estas a l'escena 1")
-    
-    case 2:
-        print ("estas a l'escena 2")
-    
-    case 3:
-        print ("estas a l'escena 3")
+def main():
+    actualitzaEscena(LlistaMapa[posMapY][posMapX])
+    entrada.bind("<Return>", moviment)
 
-    case 4:
-        print ("estas a l'escena 4")
-        novaEscena = image2
-    
-    case 5:
-        print ("estas a l'escena 5")
-    
-    case 6:
-        print ("estas a l'escena 6")
-    
-    case 7:
-        print ("estas a l'escena 7")
+print (posicionMapa)
 
-    case 8:
-        print ("estas a l'escena 8")
-    
-    case 9:
-        print ("estas a l'escena 9")
-    
+
 
 
 finestra.mainloop()

@@ -32,8 +32,34 @@ x_center = (finestraX - canvasX) // 2
 y_center = (finestraY - canvasY) // 2
 canvas.place(x=x_center, y=y_center)
 
+#Descripcions
+descripcio2 = "Prado"
+descripcio3 = "Mazmorra"
+descripcio4 = "Zona d'entrenament"
+descripcio5 = "Poble inicial"
+descripcio6 = "Casa de la maga"
+descripcio8 = "Gremi d'aventurers"
+
+# Creació labels
+label_coordenadores = tk.Label(finestra, text="Coordenades: ", font=("Arial", 16))
+label_coordenadores.place(x=x_center * 0.1, y=y_center * 0.1)
+
+label_coordenadores = tk.Label(finestra, text=LlistaMapa[posMapY][posMapX], font=("Arial", 16))
+label_coordenadores.place(x=x_center * 0.65, y=y_center * 0.1)
+
+label_titol_escena = tk.Label(finestra, text=descripcio5, font=("Arial", 16))
+label_titol_escena.place(x=x_center * 1.75, y=y_center * 0.75)
+
+label_accio = tk.Label(finestra, text="Acció: ", font=("Arial", 16))
+label_accio.place(x=x_center * 1.15, y=y_center * 3.2)
+
+entrada = tk.Entry(finestra,font=("Arial", 14))
+entrada.place(x=x_center * 1.4, y=y_center * 3.2)
+entrada.focus_set()
+
+
 def actualitzaEscena(escena):
-    global posMapX, posMapY, image1, image2, novaEscena
+    global posMapX, posMapY, image1, image2, novaEscena, novaDescripcio
 
     match escena:
 
@@ -43,23 +69,29 @@ def actualitzaEscena(escena):
         case 2:
             print ("estas a l'escena 2")
             novaEscena = image2
+            novaDescripcio = descripcio2
         
         case 3:
             print ("estas a l'escena 3")
             novaEscena = image3
+            novaDescripcio = descripcio3
 
         case 4:
             print ("estas a l'escena 4")
             novaEscena = image5
+            novaDescripcio = descripcio4
             
         
         case 5:
             print ("estas a l'escena 5")
             novaEscena = image1
+            novaDescripcio = descripcio5
+            
         
         case 6:
             print ("estas a l'escena 6")
             novaEscena = image4
+            novaDescripcio = descripcio6
         
         case 7:
             print ("estas a l'escena 7")
@@ -67,16 +99,14 @@ def actualitzaEscena(escena):
         case 8:
             print ("estas a l'escena 8")
             novaEscena = image6
+            novaDescripcio = descripcio8
         
         case 9:
             print ("estas a l'escena 9")
         
     canvas.itemconfig(img_escena_id, image= novaEscena)
+    label_titol_escena.config(text=novaDescripcio)
 
-
-entrada = tk.Entry(finestra,font=("Arial", 14))
-entrada.place(x=x_center * 1.4, y=y_center * 3.2)
-entrada.focus_set()
 
 def moviment(event=None):
     global posMapY, posMapX
@@ -104,7 +134,7 @@ def moviment(event=None):
     actualitzaEscena(LlistaMapa[posMapY][posMapX])
     entrada.delete(0, tk.END)
 
-    print (LlistaMapa[posMapY][posMapX])
+    label_coordenadores.config(text=LlistaMapa[posMapY][posMapX])
 
 def main():
     actualitzaEscena(LlistaMapa[posMapY][posMapX])

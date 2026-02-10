@@ -21,7 +21,10 @@ canvas = tk.Canvas(finestra, width=canvasX, height=canvasY, bg="lightblue")
 
 image1 = tk.PhotoImage(file="img/PobleInicial.png")
 image2 = tk.PhotoImage(file="img/Prado.png")
-
+image3 = tk.PhotoImage(file="img/EntradaMazmorra.png")
+image4 = tk.PhotoImage(file="img/CasaMaga.png")
+image5 = tk.PhotoImage(file="img/CampoEntrenamiento.png")
+image6 = tk.PhotoImage(file="img/GremioAventureros.png")
 novaEscena = image1
 img_escena_id = canvas.create_image(finestraX // 4, finestraY // 4, image = novaEscena)
 
@@ -29,37 +32,41 @@ x_center = (finestraX - canvasX) // 2
 y_center = (finestraY - canvasY) // 2
 canvas.place(x=x_center, y=y_center)
 
-posicionMapa = LlistaMapa[posMapY][posMapX]
 def actualitzaEscena(escena):
     global posMapX, posMapY, image1, image2, novaEscena
 
-    match posicionMapa:
+    match escena:
 
         case 1:
             print ("estas a l'escena 1")
         
         case 2:
             print ("estas a l'escena 2")
+            novaEscena = image2
         
         case 3:
             print ("estas a l'escena 3")
+            novaEscena = image3
 
         case 4:
             print ("estas a l'escena 4")
-            novaEscena = image2
-            actualitzaEscena(LlistaMapa[posMapY][posMapX])
+            novaEscena = image5
+            
         
         case 5:
             print ("estas a l'escena 5")
+            novaEscena = image1
         
         case 6:
             print ("estas a l'escena 6")
+            novaEscena = image4
         
         case 7:
             print ("estas a l'escena 7")
 
         case 8:
             print ("estas a l'escena 8")
+            novaEscena = image6
         
         case 9:
             print ("estas a l'escena 9")
@@ -69,36 +76,41 @@ def actualitzaEscena(escena):
 
 entrada = tk.Entry(finestra,font=("Arial", 14))
 entrada.place(x=x_center * 1.4, y=y_center * 3.2)
+entrada.focus_set()
 
 def moviment(event=None):
-    global posMapY, posMapX, posicionMapa
+    global posMapY, posMapX
     
     text = entrada.get()
     match text:
         case "nord":
             posMapY -= 1
-            actualitzaEscena(LlistaMapa[posMapY][posMapX])
     
         case "sud":
             posMapY += 1
-        
+
         case "est":
             posMapX += 1
 
         case "oest":
             posMapX -= 1
-
-    posicionMapa = LlistaMapa[posMapY][posMapX]
+        
+        case "sortir":
+            finestra.destroy()
+    
+        case _:
+            print("Moviment no vàlid")
+        
+    actualitzaEscena(LlistaMapa[posMapY][posMapX])
     entrada.delete(0, tk.END)
 
-    print (posicionMapa)
+    print (LlistaMapa[posMapY][posMapX])
 
 def main():
     actualitzaEscena(LlistaMapa[posMapY][posMapX])
     entrada.bind("<Return>", moviment)
 
-print (posicionMapa)
-
+main()
 
 
 

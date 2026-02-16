@@ -20,8 +20,8 @@ posMapY = 1
 canvas = tk.Canvas(finestra, width=canvasX, height=canvasY, bg="lightblue")
 
 image1 = tk.PhotoImage(file="img/PobleInicial.png")
-image2 = tk.PhotoImage(file="img/Prado.png")
-image3 = tk.PhotoImage(file="img/EntradaMazmorra.png")
+image2 = tk.PhotoImage(file="img/ZonaAventura001.png")
+image3 = tk.PhotoImage(file="img/EntradaMazmorra02.png")
 image4 = tk.PhotoImage(file="img/CasaMaga.png")
 image5 = tk.PhotoImage(file="img/CampoEntrenamiento.png")
 image6 = tk.PhotoImage(file="img/GremioAventureros.png")

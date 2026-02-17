@@ -13,6 +13,7 @@ print(canvasX)
 print(canvasY)
 
 LlistaMapa = [[1,2,3],[4,5,6],[7,8,9]]
+LlistaInventari = ["claus", "pá", "roba"]
 
 posMapX = 1
 posMapY = 1
@@ -31,6 +32,36 @@ img_escena_id = canvas.create_image(finestraX // 4, finestraY // 4, image = nova
 x_center = (finestraX - canvasX) // 2
 y_center = (finestraY - canvasY) // 2
 canvas.place(x=x_center, y=y_center)
+
+
+def investigarZona():
+
+    zona = LlistaMapa[posMapY][posMapX]
+
+    match zona:
+
+        case 2:
+            print("Enemic trobat!!")
+        
+        case 3:
+                if "ClausMazmorra" in LlistaInventari:
+                    print ("Porta oberta!!")
+                    
+                else:
+                    print("Necessites les claus!")
+        
+        case 5:
+            print("No s'ha trobat res")
+            
+def sortirJoc():
+    finestra.destroy()
+
+#Botons
+botonInvestigarZona = tk.Button(finestra, text="Investigar zona", command=investigarZona)
+botonInvestigarZona.place(x=x_center*3.15, y=y_center*2.75)
+
+botonInvestigarZona = tk.Button(finestra, text="Sortir del joc", command=sortirJoc)
+botonInvestigarZona.place(x=x_center*3.15, y=y_center*3)
 
 #Descripcions
 descripcio2 = "Prado"
@@ -52,6 +83,14 @@ label_titol_escena.place(x=x_center * 1.75, y=y_center * 0.75)
 
 label_accio = tk.Label(finestra, text="Acció: ", font=("Arial", 16))
 label_accio.place(x=x_center * 1.15, y=y_center * 3.2)
+
+label_inventari = tk.Label(finestra, text="Inventari: ", font=("Arial", 16))
+label_inventari.place(x=x_center * 0.15, y=y_center * 1)
+
+
+objecte_text = "\n".join(LlistaInventari)
+label_objectes = tk.Label(finestra, text=objecte_text, font=("Arial", 16), justify="left")
+label_objectes.place(x=x_center * 0.15, y=y_center * 1.15)
 
 entrada = tk.Entry(finestra,font=("Arial", 14))
 entrada.place(x=x_center * 1.4, y=y_center * 3.2)
@@ -115,18 +154,27 @@ def moviment(event=None):
     match text:
         case "nord":
             posMapY -= 1
-    
+            if posMapY < 0:
+                print("No pots anar cap allá")
+                posMapY += 1
+
         case "sud":
             posMapY += 1
+            if posMapY > 2:
+                print("No pots anar cap allá")
+                posMapY -= 1
 
         case "est":
             posMapX += 1
+            if posMapX > 2:
+                print("No pots anar cap allá")
+                posMapX -= 1
 
         case "oest":
             posMapX -= 1
-        
-        case "sortir":
-            finestra.destroy()
+            if posMapX < 0:
+                print("No pots anar cap allá")
+                posMapX += 1
     
         case _:
             print("Moviment no vàlid")

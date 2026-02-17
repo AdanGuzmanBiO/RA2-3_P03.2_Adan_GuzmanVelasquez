@@ -13,7 +13,7 @@ print(canvasX)
 print(canvasY)
 
 LlistaMapa = [[1,2,3],[4,5,6],[7,8,9]]
-LlistaInventari = ["claus", "pá", "roba"]
+LlistaInventari = ["claus", "pá", "roba", "ClausMazmorra"]
 
 posMapX = 1
 posMapY = 1
@@ -26,7 +26,9 @@ image3 = tk.PhotoImage(file="img/EntradaMazmorra02.png")
 image4 = tk.PhotoImage(file="img/CasaMaga.png")
 image5 = tk.PhotoImage(file="img/CampoEntrenamiento.png")
 image6 = tk.PhotoImage(file="img/GremioAventureros.png")
+image7 = tk.PhotoImage(file="img/ZonaMazmorra002.png")
 novaEscena = image1
+ZonaActualMazmorra = image3
 img_escena_id = canvas.create_image(finestraX // 4, finestraY // 4, image = novaEscena)
 
 x_center = (finestraX - canvasX) // 2
@@ -46,6 +48,9 @@ def investigarZona():
         case 3:
                 if "ClausMazmorra" in LlistaInventari:
                     print ("Porta oberta!!")
+                    
+                    novaEscena = image7
+                    canvas.itemconfig(img_escena_id, image= novaEscena)
                     
                 else:
                     print("Necessites les claus!")

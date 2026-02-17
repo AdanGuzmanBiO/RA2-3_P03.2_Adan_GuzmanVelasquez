@@ -28,7 +28,10 @@ image5 = tk.PhotoImage(file="img/CampoEntrenamiento.png")
 image6 = tk.PhotoImage(file="img/GremioAventureros.png")
 image7 = tk.PhotoImage(file="img/ZonaMazmorra002.png")
 novaEscena = image1
+
 ZonaActualMazmorra = image3
+portaMazmorraOberta = False
+
 img_escena_id = canvas.create_image(finestraX // 4, finestraY // 4, image = novaEscena)
 
 x_center = (finestraX - canvasX) // 2
@@ -37,6 +40,7 @@ canvas.place(x=x_center, y=y_center)
 
 
 def investigarZona():
+    global novaEscena, portaMazmorraOberta
 
     zona = LlistaMapa[posMapY][posMapX]
 
@@ -48,9 +52,10 @@ def investigarZona():
         case 3:
                 if "ClausMazmorra" in LlistaInventari:
                     print ("Porta oberta!!")
-                    
+
                     novaEscena = image7
                     canvas.itemconfig(img_escena_id, image= novaEscena)
+                    portaOberta = True
                     
                 else:
                     print("Necessites les claus!")
@@ -74,6 +79,7 @@ descripcio3 = "Mazmorra"
 descripcio4 = "Zona d'entrenament"
 descripcio5 = "Poble inicial"
 descripcio6 = "Casa de la maga"
+descripcio7 = "Segona zona de Mazmorra"
 descripcio8 = "Gremi d'aventurers"
 
 # Creació labels
@@ -103,7 +109,7 @@ entrada.focus_set()
 
 
 def actualitzaEscena(escena):
-    global posMapX, posMapY, image1, image2, novaEscena, novaDescripcio
+    global posMapX, posMapY, image1, image2, novaEscena, novaDescripcio, portaOberta
 
     match escena:
 
@@ -117,8 +123,12 @@ def actualitzaEscena(escena):
         
         case 3:
             print ("estas a l'escena 3")
-            novaEscena = image3
-            novaDescripcio = descripcio3
+            if portaMazmorraOberta == False:
+                novaEscena = image3
+                novaDescripcio = descripcio3
+            elif portaMazmorraOberta == True:
+                novaEscena = image7
+                novaDescripcio = descripcio7
 
         case 4:
             print ("estas a l'escena 4")

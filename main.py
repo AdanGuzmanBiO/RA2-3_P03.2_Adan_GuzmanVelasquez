@@ -14,6 +14,7 @@ print(canvasY)
 
 LlistaMapa = [[1,2,3],[4,5,6],[7,8,9]]
 LlistaInventari = ["claus", "pá", "roba", "ClausMazmorra"]
+Missions = ["Ves al gremi"]
 
 posMapX = 1
 posMapY = 1
@@ -38,6 +39,8 @@ x_center = (finestraX - canvasX) // 2
 y_center = (finestraY - canvasY) // 2
 canvas.place(x=x_center, y=y_center)
 
+def mostrarMissatge(text, duracio)
+    
 
 def investigarZona():
     global novaEscena, portaMazmorraOberta
@@ -55,13 +58,25 @@ def investigarZona():
 
                     novaEscena = image7
                     canvas.itemconfig(img_escena_id, image= novaEscena)
-                    portaOberta = True
+                    portaMazmorraOberta = True
+                    LlistaInventari.remove("ClausMazmorra")
+                    actualitzaHUD()
                     
                 else:
                     print("Necessites les claus!")
         
         case 5:
             print("No s'ha trobat res")
+
+        case 8:
+            Missions.pop()
+            Missions.append("Ves al pantà")
+            actualitzaHUD()
+
+def actualitzaHUD():
+    label_missions_text.config(text="\n".join(Missions))
+    label_objectes.config(text="\n".join(LlistaInventari))
+
             
 def sortirJoc():
     finestra.destroy()
@@ -74,7 +89,7 @@ botonInvestigarZona = tk.Button(finestra, text="Sortir del joc", command=sortirJ
 botonInvestigarZona.place(x=x_center*3.15, y=y_center*3)
 
 #Descripcions
-descripcio2 = "Prado"
+descripcio2 = "Pantà"
 descripcio3 = "Mazmorra"
 descripcio4 = "Zona d'entrenament"
 descripcio5 = "Poble inicial"
@@ -86,8 +101,8 @@ descripcio8 = "Gremi d'aventurers"
 label_coordenadores = tk.Label(finestra, text="Coordenades: ", font=("Arial", 16))
 label_coordenadores.place(x=x_center * 0.1, y=y_center * 0.1)
 
-label_coordenadores = tk.Label(finestra, text=LlistaMapa[posMapY][posMapX], font=("Arial", 16))
-label_coordenadores.place(x=x_center * 0.65, y=y_center * 0.1)
+label_coordenadores_actuales = tk.Label(finestra, text=LlistaMapa[posMapY][posMapX], font=("Arial", 16))
+label_coordenadores_actuales.place(x=x_center * 0.65, y=y_center * 0.1)
 
 label_titol_escena = tk.Label(finestra, text=descripcio5, font=("Arial", 16))
 label_titol_escena.place(x=x_center * 1.75, y=y_center * 0.75)
@@ -98,10 +113,20 @@ label_accio.place(x=x_center * 1.15, y=y_center * 3.2)
 label_inventari = tk.Label(finestra, text="Inventari: ", font=("Arial", 16))
 label_inventari.place(x=x_center * 0.15, y=y_center * 1)
 
+label_missions = tk.Label(finestra, text="Missions: ", font=("Arial", 16))
+label_missions.place(x=x_center * 3.05, y=y_center * 1)
 
 objecte_text = "\n".join(LlistaInventari)
 label_objectes = tk.Label(finestra, text=objecte_text, font=("Arial", 16), justify="left")
 label_objectes.place(x=x_center * 0.15, y=y_center * 1.15)
+
+missions_text = "\n".join(Missions)
+label_missions_text = tk.Label(finestra, text=missions_text, font=("Arial", 16), justify="right")
+label_missions_text.place(x=x_center * 3.05, y=y_center * 1.15)
+
+text = ""
+label_Missatge = tk.Label(finestra, text=text, font=("Arial", 16), fg="red", wraplength= 400, justify="center")
+label_Missatge.place(x=x_center*1.75, y=y_center*0.25)
 
 entrada = tk.Entry(finestra,font=("Arial", 14))
 entrada.place(x=x_center * 1.4, y=y_center * 3.2)
@@ -181,13 +206,13 @@ def moviment(event=None):
 
         case "est":
             posMapX += 1
-            if posMapX > 2:
+            if posMapX > 2 or LlistaMapa[posMapY][posMapX] == 9:
                 print("No pots anar cap allá")
                 posMapX -= 1
 
         case "oest":
             posMapX -= 1
-            if posMapX < 0:
+            if posMapX < 0 or LlistaMapa[posMapY][posMapX] == 1 or LlistaMapa[posMapY][posMapX] == 7:
                 print("No pots anar cap allá")
                 posMapX += 1
     
@@ -197,7 +222,7 @@ def moviment(event=None):
     actualitzaEscena(LlistaMapa[posMapY][posMapX])
     entrada.delete(0, tk.END)
 
-    label_coordenadores.config(text=LlistaMapa[posMapY][posMapX])
+    label_coordenadores_actuales.config(text=LlistaMapa[posMapY][posMapX])
 
 def main():
     actualitzaEscena(LlistaMapa[posMapY][posMapX])

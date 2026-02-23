@@ -14,6 +14,7 @@ print(canvasY)
 
 LlistaMapa = [[1,2,3],[4,5,6],[7,8,9]]
 LlistaInventari = []
+Habilitats = []
 Missions = ["Ves al gremi"]
 MissionsCompletades = []
 
@@ -80,15 +81,18 @@ def investigarZona():
                     portaMazmorraOberta = True
                     LlistaInventari.remove("Claus de la Mazmorra")
                     actualitzaHUD()
+
+                elif novaEscena =
                     
                 else:
                     mostrarMissatge(text="Necessites les claus!", color="red")
         
         case 4:
             if "Ves a la zona d'entrenament" in Missions:
-                mostrarMissatge(text="Atac especial fisic aprés!!", color="green")
+                mostrarMissatge(text="Atac fisic aprés!!", color="green")
                 Missions.pop()
-                Missions.append("Ves al prado")
+                Missions.append("Ves al pantà")
+                Habilitats.append("atac fisic")
                 actualitzaHUD()
             else:
                 mostrarMissatge(text="No pot aprendre res encara")
@@ -101,12 +105,12 @@ def investigarZona():
             if "Ves al gremi" in Missions:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
                 Missions.pop()
-                Missions.append("Ves al pantà")
+                Missions.append("Ves a la zona d'entrenament")
                 actualitzaHUD()
             elif "Torna al gremi" in Missions and "Elimina l'enemic 01" in MissionsCompletades:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
                 Missions.pop()
-                Missions.append("Ves a la zona d'entrenament")
+                Missions.append("Obre la porta de la mazmorra")
                 actualitzaHUD()
             elif "Demana informació sobre les claus al gremi" in Missions and "Elimina l'enemic 02" in MissionsCompletades:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
@@ -152,8 +156,20 @@ label_coordenadores_actuales.place(x=x_center * 0.65, y=y_center * 0.1)
 label_titol_escena = tk.Label(finestra, text=descripcio5, font=("Arial", 16))
 label_titol_escena.place(x=x_center * 1.75, y=y_center * 0.75)
 
+label_accio_moviment = tk.Label(finestra, text="Moviment: ", font=("Arial", 16))
+label_accio_moviment.place(x=x_center * 1.15, y=y_center * 3.2)
+
+label_accio_moviment_possible = tk.Label(finestra, text="Nord, Sud, Est i Oest", font=("Arial", 16))
+label_accio_moviment_possible.place(x=x_center * 1.55, y=y_center * 3.2)
+
+label_accio_combat = tk.Label(finestra, text="Combat: ", font=("Arial", 16))
+label_accio_combat.place(x=x_center * 1.15, y=y_center * 3.4)
+
+label_accio_combat_02 = tk.Label(finestra, text="Atac fisic i Atack magic", font=("Arial", 16))
+label_accio_combat_02.place(x=x_center * 1.50, y=y_center * 3.4)
+
 label_accio = tk.Label(finestra, text="Acció: ", font=("Arial", 16))
-label_accio.place(x=x_center * 1.15, y=y_center * 3.2)
+label_accio.place(x=x_center * 1.15, y=y_center * 3.6)
 
 label_inventari = tk.Label(finestra, text="Inventari: ", font=("Arial", 16))
 label_inventari.place(x=x_center * 0.15, y=y_center * 1)
@@ -174,7 +190,7 @@ label_Missatge = tk.Label(finestra, text=text, font=("Arial", 16), fg="red", wra
 label_Missatge.place(x=x_center*1.65, y=y_center*0.25)
 
 entrada = tk.Entry(finestra,font=("Arial", 14))
-entrada.place(x=x_center * 1.4, y=y_center * 3.2)
+entrada.place(x=x_center * 1.4, y=y_center * 3.6)
 entrada.focus_set()
 
 
@@ -265,24 +281,37 @@ def moviment(event=None):
                 print("No pots anar cap allá")
                 posMapX += 1
 
-        case "atacar":
-            if LlistaMapa[posMapY][posMapX] == 2 and enemic1_viu == True and "Elimina l'enemic" in Missions:
-                mostrarMissatge(text="Enemic del pantà derrotat!!", color="green")
-                Missions.pop()
-                Missions.append("Torna al gremi")
-                MissionsCompletades.append("Elimina l'enemic 01")
-                actualitzaHUD()
-                enemic1_viu = False
-                
-            elif LlistaMapa[posMapY][posMapX] == 2 and enemic2_viu == True and "Elimina l'enemic" in Missions:
-                mostrarMissatge(text="Enemic del prado derrotat!!", color="green")
-                LlistaInventari.append("Claus de la Mazmorra")
-                Missions.pop()
-                Missions.append("Demana informació sobre les claus al gremi")
-                MissionsCompletades.append("Elimina l'enemic 02")
-                actualitzaHUD()
+        case "atac fisic":
+            if "atac fisic" in Habilitats:
+                if LlistaMapa[posMapY][posMapX] == 2 and enemic1_viu == True and "Elimina l'enemic" in Missions:
+                    mostrarMissatge(text="Enemic del pantà derrotat!!", color="green")
+                    LlistaInventari.append("Claus de la Mazmorra")
+                    Missions.pop()
+                    Missions.append("Torna al gremi")
+                    MissionsCompletades.append("Elimina l'enemic 01")
+                    actualitzaHUD()
+                    enemic1_viu = False
+                    
+                elif LlistaMapa[posMapY][posMapX] == 2 and enemic2_viu == True and "Elimina l'enemic" in Missions:
+                    mostrarMissatge(text="Enemic del prado derrotat!!", color="green")
+                    Missions.pop()
+                    Missions.append("Demana informació sobre les claus al gremi")
+                    MissionsCompletades.append("Elimina l'enemic 02")
+                    actualitzaHUD()
+                else:
+                    mostrarMissatge(text="No pots atacar aquí", color="red")
             else:
-                mostrarMissatge(text="No pots atacar aquí", color="red")
+                mostrarMissatge(text="No has aprés aquesta habilitat encara")
+
+        case "atac magic":
+            if "atack magic" in Habilitats:
+                if LlistaMapa[posMapY][posMapX == 2]:
+                    mostrarMissatge(text="No pots utilitzar aquesta habilitat aquí.")
+
+            else:
+                mostrarMissatge(text="No has aprés aquesta habilitat encara")
+                
+
     
         case _:
             print("Moviment no vàlid")
@@ -300,4 +329,4 @@ main()
 
 
 
-finestra.mainloop()
+finestra.mainloop() 

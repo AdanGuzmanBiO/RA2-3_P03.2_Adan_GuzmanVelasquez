@@ -53,6 +53,12 @@ def mostrarMissatge(text, duracio=5000, color = "red"):
     label_Missatge.config(text=text, fg=color)
     finestra.after(duracio, lambda:label_Missatge.config(text=""))
 
+def mostrarDialeg(text, duracio=5000, color = "green"):
+    canvas.itemconfig(dialeg_canvas,text=text, fill=color)
+    finestra.after(duracio, lambda:canvas.itemconfig(dialeg_canvas,text=""))
+
+
+
 def investigarZona():
     global novaEscena, portaMazmorraOberta, BossInvocat
 
@@ -96,6 +102,8 @@ def investigarZona():
                 elif novaEscena == image7 and "atac magic" in Habilitats and "Invoca el boss final a la mazmorra" in Missions:
                     novaEscena = image9
                     canvas.itemconfig(img_escena_id, image= novaEscena)
+                    novaDescripcio = descripcio1
+                    label_titol_escena.config(text=novaDescripcio)
                     BossInvocat = True
                     mostrarMissatge(text="Boss final invocat!!", color="red")
                     Missions.pop()
@@ -112,16 +120,19 @@ def investigarZona():
         case 4:
             if "Ves a la zona d'entrenament" in Missions:
                 mostrarMissatge(text="Atac fisic aprés!!", color="green")
+                mostrarDialeg(text="Guerrer: Tens talent per l'esgrima, segueix entrenant novat!", color="yellow")
                 Missions.pop()
                 Missions.append("Ves al pantà")
                 Habilitats.append("atac fisic")
                 actualitzaHUD()
             else:
                 mostrarMissatge(text="No pot aprendre res encara")
+                mostrarDialeg(text="Guerrer: Encara no pots entrenar aquí, fora!", color="yellow")
 
         case 6:
             if "Ves a la casa de la maga" in Missions and "Grimori" in LlistaInventari:
                 mostrarMissatge(text="Atac magic aprés!!", color="green")
+                mostrarDialeg(text="Maga: Amb aquest atac magic et pots obrir camí per noves zones perilloses.")
                 Missions.pop()
                 Missions.append("Ves a la mazmorra")
                 Habilitats.append("atac magic")
@@ -129,12 +140,14 @@ def investigarZona():
                 
             else:
                 mostrarMissatge(text="No pots aprendre res encara")
+                mostrarDialeg(text="Maga: No estás en condicions encara per aprendre magia")
 
         
         case 5:
             mostrarMissatge(text="No s'ha trobat res")
             if "Demana informació sobre el grimori en el poble" in Missions and "Elimina l'enemic 02" in MissionsCompletades:
                 mostrarMissatge(text="Localització de la maga aconseguida!", color="green")
+                mostrarDialeg(text="Aldeana: La casa de la maga está cap a l'est desde aquest Poble, però es perillosa!", color="black")
                 Missions.pop()
                 Missions.append("Ves a la casa de la maga")
                 actualitzaHUD()
@@ -142,22 +155,26 @@ def investigarZona():
         case 8:
             if "Ves al gremi" in Missions:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
+                mostrarDialeg(text="Lider del gremi: Amb el tue nivell no pots fer missions! Parla amb el guerrer i després ves al pantà", color="yellow")
                 Missions.pop()
                 Missions.append("Ves a la zona d'entrenament")
                 actualitzaHUD()
             elif "Torna al gremi" in Missions and "Elimina l'enemic 01" in MissionsCompletades:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
+                mostrarDialeg(text="Lidel del gremi: Bona feina! Amb aquestes claus pots obrir la porta de la mazmorra.", color="yellow")
                 Missions.pop()
                 Missions.append("Obre la porta de la mazmorra")
                 actualitzaHUD()
             elif "Informar al gremi sobre la mazmorra" in Missions:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
+                mostrarDialeg(text="Lidel del gremi: Encara no tens el nivell suficient per investigar aquesta mazmorra, aconsegueis nivell al Prado!", color="yellow")
                 Missions.pop()
                 Missions.append("Ves al Prado")
                 actualitzaHUD()
             
             elif "Demana informació sobre la runa al gremi" in Missions:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
+                mostrarDialeg(text="Lidel del gremi: T'has convertir en un dels millors aventurers, aquesta runa serveix per invocar al Boss en la mazmorra, ja tens el nivell suficient per fer-ho.", color="yellow")
                 Missions.pop()
                 Missions.append("Invoca el boss final a la mazmorra")
                 actualitzaHUD()
@@ -179,8 +196,8 @@ def sortirJoc():
 botonInvestigarZona = tk.Button(finestra, text="Investigar zona", command=investigarZona)
 botonInvestigarZona.place(x=x_center*3.15, y=y_center*2.75)
 
-botonInvestigarZona = tk.Button(finestra, text="Sortir del joc", command=sortirJoc)
-botonInvestigarZona.place(x=x_center*3.15, y=y_center*3)
+botonSortirJoc = tk.Button(finestra, text="Sortir del joc", command=sortirJoc)
+botonSortirJoc.place(x=x_center*3.15, y=y_center*3)
 
 #Descripcions
 descripcio1 = "Boss Final!!"
@@ -201,7 +218,7 @@ label_coordenadores_actuales = tk.Label(finestra, text=LlistaMapa[posMapY][posMa
 label_coordenadores_actuales.place(x=x_center * 0.65, y=y_center * 0.1)
 
 label_titol_escena = tk.Label(finestra, text=descripcio5, font=("Arial", 16))
-label_titol_escena.place(x=x_center * 1.75, y=y_center * 0.75)
+label_titol_escena.place(x=x_center * 1.65, y=y_center * 0.75)
 
 label_accio_moviment = tk.Label(finestra, text="Moviment: ", font=("Arial", 16))
 label_accio_moviment.place(x=x_center * 1.15, y=y_center * 3.2)
@@ -225,16 +242,19 @@ label_missions = tk.Label(finestra, text="Missions: ", font=("Arial", 16))
 label_missions.place(x=x_center * 3.05, y=y_center * 1)
 
 objecte_text = "\n".join(LlistaInventari)
-label_objectes = tk.Label(finestra, text=objecte_text, font=("Arial", 16), justify="left")
+label_objectes = tk.Label(finestra, text=objecte_text, font=("Arial", 16), justify="left", wraplength=200)
 label_objectes.place(x=x_center * 0.15, y=y_center * 1.15)
 
 missions_text = "\n".join(Missions)
-label_missions_text = tk.Label(finestra, text=missions_text, font=("Arial", 16), justify="right")
+label_missions_text = tk.Label(finestra, text=missions_text, font=("Arial", 16), justify="left", wraplength=200)
 label_missions_text.place(x=x_center * 3.05, y=y_center * 1.15)
 
 text = ""
 label_Missatge = tk.Label(finestra, text=text, font=("Arial", 16), fg="red", wraplength= 400, justify="center")
-label_Missatge.place(x=x_center*1.65, y=y_center*0.25)
+label_Missatge.place(x=x_center*1.5, y=y_center*0.25)
+
+dialeg_canvas = canvas.create_text(canvasX//2, canvasY - 40, text=text,fill="white", font=("Arial", 12), width=380, justify="center")
+
 
 entrada = tk.Entry(finestra,font=("Arial", 14))
 entrada.place(x=x_center * 1.4, y=y_center * 3.6)
@@ -242,7 +262,7 @@ entrada.focus_set()
 
 
 def actualitzaEscena(escena):
-    global posMapX, posMapY, image1, image2, novaEscena, novaDescripcio, portaOberta
+    global posMapX, posMapY, image1, image2, novaEscena, novaDescripcio
 
     match escena:
 
@@ -305,30 +325,30 @@ def actualitzaEscena(escena):
 def moviment(event=None):
     global posMapY, posMapX, enemic1_viu, enemic2_viu, enemic1_mazmorra_viu, BossInvocat
     
-    text = entrada.get()
+    text = entrada.get().strip().lower()
     match text:
         case "nord":
             posMapY -= 1
-            if posMapY < 0:
-                print("No pots anar cap allá")
+            if posMapY < 0 or LlistaMapa[posMapY][posMapX] == 1:
+                mostrarMissatge(text= "No pots anar cap allá")
                 posMapY += 1
 
         case "sud":
             posMapY += 1
-            if posMapY > 2:
-                print("No pots anar cap allá")
+            if posMapY > 2 or LlistaMapa[posMapY][posMapX] == 7 or LlistaMapa[posMapY][posMapX] == 9:
+                mostrarMissatge(text= "No pots anar cap allá")
                 posMapY -= 1
 
         case "est":
             posMapX += 1
             if posMapX > 2 or LlistaMapa[posMapY][posMapX] == 9:
-                print("No pots anar cap allá")
+                mostrarMissatge(text= "No pots anar cap allá")
                 posMapX -= 1
 
         case "oest":
             posMapX -= 1
             if posMapX < 0 or LlistaMapa[posMapY][posMapX] == 1 or LlistaMapa[posMapY][posMapX] == 7:
-                print("No pots anar cap allá")
+                mostrarMissatge(text= "No pots anar cap allá")
                 posMapX += 1
 
         case "atac fisic":

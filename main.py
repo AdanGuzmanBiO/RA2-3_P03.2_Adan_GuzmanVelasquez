@@ -1,4 +1,6 @@
 import tkinter as tk
+import simpleaudio as sa
+import threading
 
 finestraX = 1024
 finestraY = 768
@@ -6,6 +8,13 @@ finestraY = 768
 finestra = tk.Tk()
 finestra.title("Aventura grafica RPG")
 finestra.geometry(f"{finestraX}x{finestraY}")
+
+#Audio
+musica_fondo_activa = True
+musica_wave = sa.WaveObject.from_wave_file("audio/Musica_Global_RPG.wav")
+reproducir_musica = None
+reproduir_atac_fisic = sa.WaveObject.from_wave_file("audio/Atac_Fisic.wav")
+reproduir_atac_magic = sa.WaveObject.from_wave_file("audio/Atac_Magic.wav")
 
 canvasX = finestraX // 2
 canvasY = finestraY // 2
@@ -48,6 +57,16 @@ enemic1_viu = True
 enemic2_viu = True
 enemic1_mazmorra_viu = True
 BossInvocat = False
+
+def reproducir_musica_loop():
+    global musica_fondo_activa, reproducir_musica
+    while musica_fondo_activa:
+        reproducir_musica = musica_wave.play()
+        while reproducir_musica.is_playing():
+            if not musica_fondo_activa:
+                reproducir_musica.stop()
+                return
+
 
 def mostrarMissatge(text, duracio=5000, color = "red"):
     label_Missatge.config(text=text, fg=color)
@@ -190,6 +209,10 @@ def actualitzaHUD():
 
             
 def sortirJoc():
+    global musica_fondo_activa, reproducir_musica
+    musica_fondo_activa = False
+    if reproducir_musica is not None:
+        reproducir_musica.stop()
     finestra.destroy()
 
 #Botons
@@ -354,6 +377,7 @@ def moviment(event=None):
         case "atac fisic":
             if "atac fisic" in Habilitats:
                 if LlistaMapa[posMapY][posMapX] == 2 and enemic1_viu == True and "Elimina l'enemic del Pantà" in Missions:
+                    ## sa.WaveObject.from_wave_file("audio/Atac_Fisic.wav").play()
                     mostrarMissatge(text="Enemic del Pantà derrotat!!", color="green")
                     LlistaInventari.append("Claus de la Mazmorra")
                     Missions.pop()
@@ -421,6 +445,9 @@ def moviment(event=None):
 def main():
     actualitzaEscena(LlistaMapa[posMapY][posMapX])
     entrada.bind("<Return>", moviment)
+    
+    hilo_musica = threading.Thread(target=reproducir_musica_loop, daemon=True)
+    hilo_musica.start()
 
 main()
 

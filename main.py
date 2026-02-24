@@ -424,6 +424,4 @@ def main():
 
 main()
 
-
-
 finestra.mainloop() 

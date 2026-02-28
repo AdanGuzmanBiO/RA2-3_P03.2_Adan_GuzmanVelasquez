@@ -35,7 +35,10 @@ posMapX = 1
 posMapY = 1
 
 canvas = tk.Canvas(finestra, width=canvasX, height=canvasY, bg="lightblue")
+canvas_enemic = tk.Canvas(finestra, width=canvasX//2, height=canvasY//2, bg="lightblue")
 
+
+# Imatges escenes
 image1 = tk.PhotoImage(file="img/PobleInicial.png")
 image2 = tk.PhotoImage(file="img/ZonaAventura001.png")
 image3 = tk.PhotoImage(file="img/EntradaMazmorra02.png")
@@ -47,10 +50,15 @@ image8 = tk.PhotoImage(file="img/ZonaAventura002.png")
 image9 = tk.PhotoImage(file="img/BossFinal.png")
 novaEscena = image1
 
+#Imatges Enemics
+enemic1_Mazmorra_img = tk.PhotoImage(file="img/Enemic_Mazmorra.png")
+enemic_actual = None
+
 ZonaActualMazmorra = image3
 portaMazmorraOberta = False
 
 img_escena_id = canvas.create_image(finestraX // 4, finestraY // 4, image = novaEscena)
+img_enemic_id = canvas_enemic.create_image(finestraX // 8, finestraY // 8, image = enemic_actual)
 
 x_center = (finestraX - canvasX) // 2
 y_center = (finestraY - canvasY) // 2
@@ -70,6 +78,25 @@ def mostrarDialeg(text, duracio=5000, color = "green"):
     canvas.itemconfig(dialeg_canvas,text=text, fill=color)
     finestra.after(duracio, lambda:canvas.itemconfig(dialeg_canvas,text=""))
 
+def ActualitzarMissio(Missio_Nova, Missio_Completada):
+    Missions.pop()
+    Missions.append(Missio_Nova)
+    MissionsCompletades.append(Missio_Completada)
+    actualitzaHUD()
+
+def MostrarEnemic(enemic):
+    global enemic_actual
+    enemic_actual = enemic
+    canvas_enemic.itemconfig(img_enemic_id, image= enemic_actual)
+    canvas_enemic.place(x=x_center*1.75, y=y_center*1.95)
+
+def OcultarEnemic():
+    global enemic_actual
+    enemic_actual = None
+    canvas_enemic.itemconfig(img_enemic_id, image= enemic_actual)
+    canvas_enemic.place_forget()
+
+
 
 
 def investigarZona():
@@ -81,6 +108,7 @@ def investigarZona():
 
         case 2:
             if "Ves al pantà" in Missions:
+                MostrarEnemic(enemic1_Mazmorra_img)
                 mostrarMissatge(text="Enemic trobat!!", color="red")
                 Missions.pop()
                 Missions.append("Elimina l'enemic del Pantà")
@@ -131,29 +159,35 @@ def investigarZona():
                     
         
         case 4:
-            if "Ves a la zona d'entrenament" in Missions:
-                mostrarMissatge(text="Atac fisic aprés!!", color="green")
-                mostrarDialeg(text="Guerrer: Tens talent per l'esgrima, segueix entrenant novat!", color="yellow")
-                Missions.pop()
-                Missions.append("Ves al pantà")
-                Habilitats.append("atac fisic")
-                actualitzaHUD()
+            if "atac fisic" in Habilitats:
+                mostrarDialeg(text="Guerrer: Ja no et puc ensenyar res més, segueix fent les missions!", color="yellow")
             else:
-                mostrarMissatge(text="No pot aprendre res encara")
-                mostrarDialeg(text="Guerrer: Encara no pots entrenar aquí, fora!", color="yellow")
+                if "Ves a la zona d'entrenament" in Missions:
+                    mostrarMissatge(text="Atac fisic aprés!!", color="green")
+                    mostrarDialeg(text="Guerrer: Tens talent per l'esgrima, segueix entrenant novat!", color="yellow")
+                    Missions.pop()
+                    Missions.append("Ves al pantà")
+                    Habilitats.append("atac fisic")
+                    actualitzaHUD()
+                else:
+                    mostrarMissatge(text="No pot aprendre res encara")
+                    mostrarDialeg(text="Guerrer: Encara no pots entrenar aquí, fora!", color="yellow")
 
         case 6:
-            if "Ves a la casa de la maga" in Missions and "Grimori" in LlistaInventari:
-                mostrarMissatge(text="Atac magic aprés!!", color="green")
-                mostrarDialeg(text="Maga: Amb aquest atac magic et pots obrir camí per noves zones perilloses.")
-                Missions.pop()
-                Missions.append("Ves a la mazmorra")
-                Habilitats.append("atac magic")
-                actualitzaHUD()
-                
+            if "atac magic" in Habilitats:
+                mostrarDialeg(text="Maga: No puc ensenyar-te res mes. Ja tens els elements necessaris per continuar la teva aventura", color="green")
             else:
-                mostrarMissatge(text="No pots aprendre res encara")
-                mostrarDialeg(text="Maga: No estás en condicions encara per aprendre magia")
+                if "Ves a la casa de la maga" in Missions and "Grimori" in LlistaInventari:
+                    mostrarMissatge(text="Atac magic aprés!!", color="green")
+                    mostrarDialeg(text="Maga: Amb aquest atac magic et pots obrir camí per noves zones perilloses.")
+                    Missions.pop()
+                    Missions.append("Ves a la mazmorra")
+                    Habilitats.append("atac magic")
+                    actualitzaHUD()
+                    
+                else:
+                    mostrarMissatge(text="No pots aprendre res encara")
+                    mostrarDialeg(text="Maga: No estás en condicions encara per aprendre magia")
 
         
         case 5:
@@ -372,6 +406,7 @@ def moviment(event=None):
             if "atac fisic" in Habilitats:
                 if LlistaMapa[posMapY][posMapX] == 2 and enemic1_viu == True and "Elimina l'enemic del Pantà" in Missions:
                     so_atac_fisic.play()
+                    OcultarEnemic()
                     mostrarMissatge(text="Enemic del Pantà derrotat!!", color="green")
                     LlistaInventari.append("Claus de la Mazmorra")
                     Missions.pop()
@@ -381,6 +416,7 @@ def moviment(event=None):
                     enemic1_viu = False
 
                 elif LlistaMapa[posMapY][posMapX] == 2 and enemic2_viu == True and "Elimina l'enemic del Prado" in Missions:
+                    so_atac_fisic.play()
                     mostrarMissatge(text="Enemic del Prado derrotat!!", color="green")
                     LlistaInventari.append("Grimori")
                     Missions.pop()
@@ -390,6 +426,7 @@ def moviment(event=None):
                     enemic2_viu = False
                 
                 elif LlistaMapa[posMapY][posMapX] == 3 and enemic1_mazmorra_viu == True and "Elimina l'enemic mazmorra 01" in Missions:
+                    so_atac_fisic.play()
                     mostrarMissatge(text="Enemic de la mazmorra derrotat!!", color="green")
                     LlistaInventari.append("Runa d'invocació del boss")
                     Missions.pop()
@@ -399,6 +436,7 @@ def moviment(event=None):
                     enemic1_mazmorra_viu = False
                 
                 elif LlistaMapa[posMapY][posMapX] == 3 and BossInvocat == True and "Elimina el boss final" in Missions:
+                    so_atac_fisic.play()
                     mostrarMissatge(text="Boss final derrotat!!", color="green")
                     Missions.pop()
                     Missions.append("Sense missions, joc completat!")
@@ -423,6 +461,14 @@ def moviment(event=None):
                     MissionsCompletades.append("Elimina l'enemic mazmorra 01")
                     actualitzaHUD()
                     enemic1_mazmorra_viu = False
+                elif LlistaMapa[posMapY][posMapX] == 3 and BossInvocat == True and "Elimina el boss final" in Missions:
+                    so_atac_magic.play()
+                    mostrarMissatge(text="Boss final derrotat!!", color="green")
+                    Missions.pop()
+                    Missions.append("Sense missions, joc completat!")
+                    MissionsCompletades.append("Elimina el boss final")
+                    actualitzaHUD()
+                    BossInvocat = False
 
             else:
                 mostrarMissatge(text="No has aprés aquesta habilitat encara")

@@ -15,6 +15,14 @@ musica_fondo_activa = True
 pygame.mixer.music.load("audio/Musica_Global_RPG.wav")
 so_atac_fisic = pygame.mixer.Sound("audio/Atac_Fisic.wav")
 so_atac_magic = pygame.mixer.Sound("audio/Atac_Magic.wav")
+so_PortaMazmorraOberta = pygame.mixer.Sound("audio/PortaMazmorraOberta.wav")
+so_EntrenamentEsgrima = pygame.mixer.Sound("audio/EntrenamentEsgrima.wav")
+So_EntrenamentMagia = pygame.mixer.Sound("audio/EntrenamentMagia.wav")
+so_Enemic_Panta = pygame.mixer.Sound("audio/soEnemicPanta.wav")
+so_Enemic_Prat = pygame.mixer.Sound("audio/soEnemicPrat.wav")
+so_Enemic_Mazmorra = pygame.mixer.Sound("audio/soEnemicMazmorra.wav")
+so_BossFinal = pygame.mixer.Sound("audio/RugidoBoss.wav")
+so_Victoria = pygame.mixer.Sound("audio/Victoria.wav")
 reproducir_musica = None
 
 # Creem el canvas del joc
@@ -24,6 +32,7 @@ posMapX = 1
 posMapY = 1
 canvas = tk.Canvas(finestra, width=canvasX, height=canvasY, bg="lightblue")
 canvas_enemic = tk.Canvas(finestra, width=canvasX//2, height=canvasY//2, bg="lightblue")
+canvas_personatge = tk.Canvas(finestra, width=canvasX//4, height=canvasY//4, bg="lightblue")
 
 # Creem les llistes per al mapa, inventari, habilitats i missions
 LlistaMapa = [[1,2,3],[4,5,6],[7,8,9]]
@@ -50,6 +59,13 @@ enemic_Panta_img = tk.PhotoImage(file="img/Enemic_Panta.png")
 enemic_Prado_img = tk.PhotoImage(file="img/Enemic_Prado.png")
 enemic_actual = None
 
+# Imatges Personatge
+Lider_Gremi_img = tk.PhotoImage(file="img/Lider_Gremi.png")
+Guerrer_img = tk.PhotoImage(file="img/Guerrer.png")
+Maga_img = tk.PhotoImage(file="img/Maga.png")
+Aldeana_img = tk.PhotoImage(file="img/Aldeana.png")
+personatge_actual = None
+
 # Imatges Zona mazmorra
 ZonaActualMazmorra = image3
 portaMazmorraOberta = False
@@ -57,6 +73,7 @@ portaMazmorraOberta = False
 # Posicionem les imatges i els canvas
 img_escena_id = canvas.create_image(finestraX // 4, finestraY // 4, image = novaEscena)
 img_enemic_id = canvas_enemic.create_image(finestraX // 8, finestraY // 8, image = enemic_actual)
+img_personatge_id = canvas_personatge.create_image(finestraX // 16, finestraY // 16, image = personatge_actual)
 
 x_center = (finestraX - canvasX) // 2
 y_center = (finestraY - canvasY) // 2
@@ -68,15 +85,38 @@ enemic2_viu = True
 enemic1_mazmorra_viu = True
 BossInvocat = False
 
+# Funció que neteja l'escena de missatges, enemics i altres elements al cambiar d'escena.
+def OcultarMisatgesObjectes():
+    ocultarMissatge()
+    ocultarDialeg()
+    OcultarEnemic()
+
 # Funció que mostra missatges al jugador
 def mostrarMissatge(text, duracio=5000, color = "red"):
     label_Missatge.config(text=text, fg=color)
+    label_Missatge.place(x=x_center*1.5, y=y_center*0.25)
     finestra.after(duracio, lambda:label_Missatge.config(text=""))
 
+def ocultarMissatge():
+    label_Missatge.place_forget()
+
 # Funció que mostra dialegs al jugador
-def mostrarDialeg(text, duracio=5000, color = "green"):
-    canvas.itemconfig(dialeg_canvas,text=text, fill=color)
-    finestra.after(duracio, lambda:canvas.itemconfig(dialeg_canvas,text=""))
+def mostrarDialeg(text, duracio=5000, color = "white", personatge_actual=None):
+    label_dialeg.config(text=text, fg=color)
+    label_dialeg.place(x=x_center*1.25, y=y_center*2.60)
+
+    canvas_personatge.itemconfig(img_personatge_id, image= personatge_actual)
+    canvas_personatge.place(x=x_center*1.15, y=y_center*2)
+
+    def ocultarDialegIntern():
+        label_dialeg.place_forget()
+        canvas_personatge.place_forget()
+
+    finestra.after(duracio, ocultarDialegIntern)
+
+def ocultarDialeg():
+    label_dialeg.place_forget()
+    canvas_personatge.place_forget()
 
 # Funció que actualitza les missions del jugador
 def ActualitzarMissio(Missio_Nova, Missio_Completada):
@@ -109,25 +149,37 @@ def investigarZona():
         case 2:
             if "Ves al pantà" in Missions:
                 MostrarEnemic(enemic_Panta_img)
+                so_Enemic_Panta.play()
                 mostrarMissatge(text="Enemic trobat!!", color="red")
                 ActualitzarMissio(Missio_Nova="Elimina l'enemic del Pantà", Missio_Completada=None)
-            elif "Ves al Prado" in Missions:
+            elif "Elimina l'enemic del Pantà" in Missions and enemic1_viu == True:
+                mostrarMissatge(text="Derrota l'enemic del pantà", color="red")
+
+            elif "Ves al Prat" in Missions:
+                so_Enemic_Prat.play()
                 MostrarEnemic(enemic_Prado_img)
                 mostrarMissatge(text="Enemic trobat!!", color="red")
-                ActualitzarMissio(Missio_Nova="Elimina l'enemic del Prado", Missio_Completada=None)
+                ActualitzarMissio(Missio_Nova="Elimina l'enemic del Prat", Missio_Completada=None)
+            elif "Elimina l'enemic del Prat" in Missions and enemic1_viu == True:
+                mostrarMissatge(text="Derrota l'enemic del Prat", color="red")
+
             else:
                 mostrarMissatge(text="No pots fer res encara aquí", color="red")
         
         case 3:
-                if "Claus de la Mazmorra" in LlistaInventari:
+                if "Claus de la Mazmorra" in LlistaInventari and "Obre la porta de la mazmorra" in Missions:
+                    so_PortaMazmorraOberta.play()
                     mostrarMissatge(text="Porta oberta!!", color="green")
                     novaEscena = image7
                     canvas.itemconfig(img_escena_id, image= novaEscena)
                     portaMazmorraOberta = True
                     LlistaInventari.remove("Claus de la Mazmorra")
                     ActualitzarMissio(Missio_Nova="Informar al gremi sobre la mazmorra", Missio_Completada="Obre la porta de la mazmorra")
+                elif "Claus de la Mazmorra" in LlistaInventari:
+                    mostrarMissatge(text="Has de parlar amb el lider del gremi abans d'obrir la porta!", color="red")
 
                 elif novaEscena == image7 and "atac magic" in Habilitats and enemic1_mazmorra_viu == True:
+                    so_Enemic_Mazmorra.play()
                     MostrarEnemic(enemic1_Mazmorra_img)
                     mostrarMissatge(text="Enemic trobat!!", color="red")
                     ActualitzarMissio(Missio_Nova="Elimina l'enemic mazmorra 01", Missio_Completada=None)
@@ -138,6 +190,7 @@ def investigarZona():
                     novaDescripcio = descripcio1
                     label_titol_escena.config(text=novaDescripcio)
                     BossInvocat = True
+                    so_BossFinal.play()
                     mostrarMissatge(text="Boss final invocat!!", color="red")
                     ActualitzarMissio(Missio_Nova="Elimina el boss final", Missio_Completada=None)
 
@@ -146,63 +199,72 @@ def investigarZona():
                         mostrarMissatge(text="Necessites les claus!", color="red")
                     elif novaEscena == image7 and "atac magic" not in Habilitats:
                         mostrarMissatge(text="No pots investigar aqui, els enemic son massa forts!", color="red")
+                    else:
+                        if "Elimina el boss final" in Missions and BossInvocat == True:
+                            mostrarMissatge(text="Derrota el boss final!", color="red")
+                        elif "Elimina el boss final" in MissionsCompletades:
+                            mostrarMissatge(text="Joc completat!", color="green")
                     
         case 4:
             if "atac fisic" in Habilitats:
-                mostrarDialeg(text="Guerrer: Ja no et puc ensenyar res més, segueix fent les missions!", color="yellow")
+                mostrarMissatge(text="No pots aprendre res mes")
+                mostrarDialeg(text="Guerrer: Ja no et puc ensenyar res més, segueix fent les missions!", color="yellow", personatge_actual=Guerrer_img)
             else:
                 if "Ves a la zona d'entrenament" in Missions:
+                    so_EntrenamentEsgrima.play()
                     Habilitats.append("atac fisic")
                     ActualitzarMissio(Missio_Nova="Ves al pantà", Missio_Completada=None)
                     mostrarMissatge(text="Atac fisic aprés!!", color="green")
-                    mostrarDialeg(text="Guerrer: Tens talent per l'esgrima, segueix entrenant novat!", color="yellow")
+                    mostrarDialeg(text="Guerrer: Tens talent per l'esgrima, segueix entrenant novat!", color="yellow", personatge_actual=Guerrer_img)
 
                 else:
                     mostrarMissatge(text="No pot aprendre res encara")
-                    mostrarDialeg(text="Guerrer: Encara no pots entrenar aquí, fora!", color="yellow")
+                    mostrarDialeg(text="Guerrer: Encara no pots entrenar aquí, fora!", color="yellow", personatge_actual=Guerrer_img)
 
         case 5:
             
             if "Demana informació sobre el grimori en el poble" in Missions and "Elimina l'enemic 02" in MissionsCompletades:
                 mostrarMissatge(text="Localització de la maga aconseguida!", color="green")
-                mostrarDialeg(text="Aldeana: La casa de la maga está cap a l'est desde aquest Poble, però es perillosa!", color="black")
+                mostrarDialeg(text="Aldeana: La casa de la maga está cap a l'est desde aquest Poble, però es perillosa!", color="white", personatge_actual=Aldeana_img)
                 ActualitzarMissio(Missio_Nova="Ves a la casa de la maga", Missio_Completada=None)
             else:
                 mostrarMissatge(text="No pots fer res aquí encara")
 
         case 6:
             if "atac magic" in Habilitats:
-                mostrarDialeg(text="Maga: No puc ensenyar-te res mes. Ja tens els elements necessaris per continuar la teva aventura", color="green")
+                mostrarMissatge(text="No pots aprendre res mes")
+                mostrarDialeg(text="Maga: No puc ensenyar-te res mes. Ja tens els elements necessaris per continuar la teva aventura", color="green", personatge_actual=Maga_img)
             else:
                 if "Ves a la casa de la maga" in Missions and "Grimori" in LlistaInventari:
+                    So_EntrenamentMagia.play()
                     mostrarMissatge(text="Atac magic aprés!!", color="green")
-                    mostrarDialeg(text="Maga: Amb aquest atac magic et pots obrir camí per noves zones perilloses.")
+                    mostrarDialeg(text="Maga: Amb aquest atac magic et pots obrir camí per noves zones perilloses.", color= "blue", personatge_actual=Maga_img)
                     ActualitzarMissio(Missio_Nova="Ves a la mazmorra", Missio_Completada=None)
                     Habilitats.append("atac magic")
                     
                 else:
                     mostrarMissatge(text="No pots aprendre res encara")
-                    mostrarDialeg(text="Maga: No estás en condicions encara per aprendre magia")
+                    mostrarDialeg(text="Maga: No estás en condicions encara per aprendre magia", color="blue", personatge_actual=Maga_img)
 
         case 8:
             if "Ves al gremi" in Missions:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
-                mostrarDialeg(text="Lider del gremi: Amb el tue nivell no pots fer missions! Parla amb el guerrer i després ves al pantà", color="yellow")
+                mostrarDialeg(text="Lider del gremi: Amb el tue nivell no pots fer missions! Parla amb el guerrer i després ves al pantà", color="green", personatge_actual=Lider_Gremi_img)
                 ActualitzarMissio(Missio_Nova="Ves a la zona d'entrenament", Missio_Completada=None)
 
             elif "Torna al gremi" in Missions and "Elimina l'enemic 01" in MissionsCompletades:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
-                mostrarDialeg(text="Lidel del gremi: Bona feina! Amb aquestes claus pots obrir la porta de la mazmorra.", color="yellow")
+                mostrarDialeg(text="Lidel del gremi: Bona feina! Amb aquestes claus pots obrir la porta de la mazmorra.", color="green", personatge_actual=Lider_Gremi_img)
                 ActualitzarMissio(Missio_Nova="Obre la porta de la mazmorra", Missio_Completada=None)
 
             elif "Informar al gremi sobre la mazmorra" in Missions:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
-                mostrarDialeg(text="Lidel del gremi: Encara no tens el nivell suficient per investigar aquesta mazmorra, aconsegueis nivell al Prado!", color="yellow")
-                ActualitzarMissio(Missio_Nova="Ves al Prado", Missio_Completada=None)
+                mostrarDialeg(text="Lidel del gremi: Encara no tens el nivell suficient per investigar aquesta mazmorra, aconsegueix nivell al Prat!", color="green", personatge_actual=Lider_Gremi_img)
+                ActualitzarMissio(Missio_Nova="Ves al Prat", Missio_Completada=None)
             
             elif "Demana informació sobre la runa al gremi" in Missions:
                 mostrarMissatge(text="Has rebut una nova missió", color="green")
-                mostrarDialeg(text="Lidel del gremi: T'has convertir en un dels millors aventurers, aquesta runa serveix per invocar al Boss en la mazmorra, ja tens el nivell suficient per fer-ho.", color="yellow")
+                mostrarDialeg(text="Lidel del gremi: T'has convertir en un dels millors aventurers, aquesta runa serveix per invocar al Boss en la mazmorra, ja tens el nivell suficient per fer-ho.",duracio= 10000, color="green", personatge_actual=Lider_Gremi_img)
                 ActualitzarMissio(Missio_Nova="Invoca el boss final a la mazmorra", Missio_Completada=None)
 
             else:
@@ -280,9 +342,10 @@ label_missions_text.place(x=x_center * 3.05, y=y_center * 1.15)
 
 text = ""
 label_Missatge = tk.Label(finestra, text=text, font=("Arial", 16), fg="red", wraplength= 400, justify="center")
-label_Missatge.place(x=x_center*1.5, y=y_center*0.25)
 
-dialeg_canvas = canvas.create_text(canvasX//2, canvasY - 40, text=text,fill="white", font=("Arial", 12), width=380, justify="center")
+label_dialeg = tk.Label(finestra, text=text, font=("Arial", 12),bg="black", fg="white", wraplength= 400, justify="left")
+
+# dialeg_canvas = canvas.create_text(canvasX//2, canvasY - 40, text=text,fill="white", font=("Arial", 12), width=380, justify="center")
 
 entrada = tk.Entry(finestra,font=("Arial", 14))
 entrada.place(x=x_center * 1.4, y=y_center * 3.6)
@@ -299,6 +362,11 @@ def actualitzaEscena(escena):
         
         case 2:
             print ("estas a l'escena 2")
+            if "Elimina l'enemic del Pantà" in Missions and enemic1_viu == True:
+                MostrarEnemic(enemic_Panta_img)
+            elif "Elimina l'enemic del Prat" in Missions and enemic2_viu == True:
+                MostrarEnemic(enemic_Prado_img)
+
             if "Elimina l'enemic 01" in MissionsCompletades:
                 novaEscena = image8
                 novaDescripcio = descripcio9
@@ -317,6 +385,9 @@ def actualitzaEscena(escena):
             elif portaMazmorraOberta == True and BossInvocat == True:
                 novaEscena = image9
                 novaDescripcio = descripcio1
+            
+            if "Elimina l'enemic mazmorra 01" in Missions and enemic1_mazmorra_viu == True:
+                MostrarEnemic(enemic1_Mazmorra_img)
 
         case 4:
             print ("estas a l'escena 4")
@@ -351,7 +422,9 @@ def actualitzaEscena(escena):
 # Solament es pot atacar als enemics si es cumpleixen les condicions de les missions i si el jugador té les habilitats necessàries per fer-ho
 def moviment(event=None):
     global posMapY, posMapX, enemic1_viu, enemic2_viu, enemic1_mazmorra_viu, BossInvocat
-    
+    posMapXAnterior = posMapX
+    posMapYAnterior = posMapY
+
     text = entrada.get().strip().lower()
     match text:
         case "nord":
@@ -388,10 +461,10 @@ def moviment(event=None):
                     ActualitzarMissio(Missio_Nova="Torna al gremi", Missio_Completada="Elimina l'enemic 01")
                     enemic1_viu = False
 
-                elif LlistaMapa[posMapY][posMapX] == 2 and enemic2_viu == True and "Elimina l'enemic del Prado" in Missions:
+                elif LlistaMapa[posMapY][posMapX] == 2 and enemic2_viu == True and "Elimina l'enemic del Prat" in Missions:
                     so_atac_fisic.play()
                     OcultarEnemic()
-                    mostrarMissatge(text="Enemic del Prado derrotat!!", color="green")
+                    mostrarMissatge(text="Enemic del Prat derrotat!!", color="green")
                     LlistaInventari.append("Grimori")
                     ActualitzarMissio(Missio_Nova="Demana informació sobre el grimori en el poble", Missio_Completada="Elimina l'enemic 02")
                     enemic2_viu = False
@@ -406,6 +479,7 @@ def moviment(event=None):
                 
                 elif LlistaMapa[posMapY][posMapX] == 3 and BossInvocat == True and "Elimina el boss final" in Missions:
                     so_atac_fisic.play()
+                    so_Victoria.play()
                     mostrarMissatge(text="Boss final derrotat!!", color="green")
                     ActualitzarMissio(Missio_Nova="Sense missions, joc completat!", Missio_Completada="Elimina el boss final")
                     BossInvocat = False
@@ -429,6 +503,7 @@ def moviment(event=None):
 
                 elif LlistaMapa[posMapY][posMapX] == 3 and BossInvocat == True and "Elimina el boss final" in Missions:
                     so_atac_magic.play()
+                    so_Victoria.play()
                     OcultarEnemic()
                     mostrarMissatge(text="Boss final derrotat!!", color="green")
                     ActualitzarMissio(Missio_Nova="Sense missions, joc completat!", Missio_Completada="Elimina el boss final")
@@ -439,10 +514,12 @@ def moviment(event=None):
     
         case _:
             print("Moviment no vàlid")
-        
-    actualitzaEscena(LlistaMapa[posMapY][posMapX])
+    
+    if posMapX != posMapXAnterior or posMapY != posMapYAnterior:
+        OcultarMisatgesObjectes()
+        actualitzaEscena(LlistaMapa[posMapY][posMapX])
+    
     entrada.delete(0, tk.END)
-
     label_coordenadores_actuales.config(text=LlistaMapa[posMapY][posMapX])
 
 # Funció principal que inicia el joc, actualitza l'escena inicial i comença la música de fons
